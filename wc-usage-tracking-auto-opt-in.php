@@ -11,11 +11,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Runs any time the download process for a plugin install or update finishes.
-function wc_tracking_optin( $upgrader_object, $hook_extra ) {
-	$option = 'woocommerce_allow_tracking';
-	if ( get_option( $option ) ) {
-		update_option( $option, 'yes' );
-	}
-}
-add_action( 'upgrader_process_complete', 'wc_tracking_optin' );
+add_filter( 'option_woocommerce_allow_tracking', function(){ return 'yes'; }, 'woocommerce_allow_tracking' );
