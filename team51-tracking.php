@@ -1,61 +1,59 @@
 <?php
-/*
-Plugin Name: Usage Tracking Auto-opt-in
-Plugin URI: https://github.com/a8cteam51/wc-usage-tracking-auto-opt-in
-Description: Automatically opts site into WooCommerce Usage Tracking and Sensei Usage Tracking
-Version: 1.0.0
-Author: WP Special Projects
-*/
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 /**
- * WooCommerce Usage Tracking Auto-opt-in
+ * The Team51 Tracking plugin bootstrap file.
+ *
+ * @since       1.0.0
+ * @version     1.0.0
+ * @author      WordPress.com Special Projects
+ * @license     GPL-3.0-or-later
+ *
+ * @noinspection    ALL
+ *
+ * @wordpress-plugin
+ * Plugin Name:             Team51 Tracking
+ * Description:             Handles automatic opt-in on parter sites to usage tracking for WooCommerce, Sensei, and other plugins/tools used by Team51.
+ * Version:                 1.0.0
+ * Requires at least:       6.1
+ * Requires PHP:            8.1
+ * Author:                  WordPress.com Special Projects
+ * Author URI:              https://wpspecialprojects.wordpress.com/
+ * License:                 GPL-3.0-or-later
+ * License URI:             https://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain:             team51-tracking
+ * Domain Path:             /languages
  */
-add_filter(
-	'option_woocommerce_allow_tracking',
-	function() {
-		return 'yes';
-	},
-	'woocommerce_allow_tracking'
-);
 
-/**
- * Sensei Usage Tracking Auto-opt-in
- */
-add_filter(
-	'option_sensei-settings',
-	function( $values ) {
-		if ( is_array( $values ) && isset( $values['sensei_usage_tracking_enabled'] ) ) {
-			$values['sensei_usage_tracking_enabled'] = true;
-		}
-		return $values;
-	}
-);
+defined( 'ABSPATH' ) || exit;
 
-/**
- * Bilmur RUM data collector
- */
+// Define plugin constants.
+function_exists( 'get_plugin_data' ) || require_once ABSPATH . 'wp-admin/includes/plugin.php';
+define( 'WPCOMSP_TRACKING_METADATA', get_plugin_data( __FILE__, false, false ) );
+
+define( 'WPCOMSP_TRACKING_BASENAME', plugin_basename( __FILE__ ) );
+define( 'WPCOMSP_TRACKING_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WPCOMSP_TRACKING_URL', plugin_dir_url( __FILE__ ) );
+
+// Load plugin translations so they are available even for the error admin notices.
 add_action(
-	'wp_enqueue_scripts',
-	function() {
-		wp_enqueue_script( 'bilmur', 'https://s0.wp.com/wp-content/js/bilmur.min.js?m=202215', array(), '1.0.0', true );
+	'init',
+	static function() {
+		load_muplugin_textdomain(
+			WPCOMSP_TRACKING_METADATA['TextDomain'],
+			dirname( plugin_basename( BPD_BLOCKS_DIR ) ) . WPCOMSP_TRACKING_METADATA['DomainPath']
+		);
 	}
 );
 
-add_filter(
-	'script_loader_tag',
-	function( $tag, $handle ) {
-		if ( 'bilmur' !== $handle ) {
-			return $tag;
+// Initialize the plugin if system requirements check out.
+$wpcomsp_tracking_requirements = validate_plugin_requirements( WPCOMSP_SCAFFOLD_BASENAME );
+define( 'WPCOMSP_TRACKING_REQUIREMENTS', $wpcomsp_tracking_requirements );
+
+if ( ! $wpcomsp_tracking_requirements instanceof WP_Error ) {
+	foreach ( glob( __DIR__ . '/includes/*.php' ) as $wpcomsp_tracking_filename ) {
+		if ( preg_match( '#/includes/_#i', $wpcomsp_tracking_filename ) ) {
+			continue; // Ignore files prefixed with an underscore.
 		}
 
-		// TODO: Values for provider and service TBD. Here's the placeholder for now.
-		return str_replace( ' src', ' data-provider="" data-service="" src', $tag );
-	},
-	10,
-	2
-);
+		include $wpcomsp_tracking_filename;
+	}
+}
