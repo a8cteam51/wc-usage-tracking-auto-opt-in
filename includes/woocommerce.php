@@ -2,6 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Allow disabling tracking via a constant.
+if ( defined( 'WPCOMSP_WC_TRACKING' ) && ! WPCOMSP_WC_TRACKING ) {
+	return;
+}
+
 /**
  * WooCommerce Usage Tracking Auto-opt-in.
  *

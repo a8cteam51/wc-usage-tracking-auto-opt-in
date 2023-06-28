@@ -2,6 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Allow disabling tracking via a constant.
+if ( defined( 'WPCOMSP_SENSEI_TRACKING' ) && ! WPCOMSP_SENSEI_TRACKING ) {
+	return;
+}
+
 /**
  * Sensei Usage Tracking Auto-opt-in.
  *

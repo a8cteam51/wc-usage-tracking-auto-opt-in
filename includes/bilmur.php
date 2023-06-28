@@ -2,6 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Only load if the constant is defined and true.
+if ( ! defined( 'WPCOMSP_BILMUR_TRACKING' ) || ! WPCOMSP_BILMUR_TRACKING ) {
+	return;
+}
+
 /**
  * Bilmur RUM data collector
  */
