@@ -39,16 +39,13 @@ add_action(
 	static function() {
 		load_muplugin_textdomain(
 			WPCOMSP_TRACKING_METADATA['TextDomain'],
-			dirname( plugin_basename( BPD_BLOCKS_DIR ) ) . WPCOMSP_TRACKING_METADATA['DomainPath']
+			plugin_basename( WPCOMSP_TRACKING_PATH ) . WPCOMSP_TRACKING_METADATA['DomainPath']
 		);
 	}
 );
 
-// Initialize the plugin if system requirements check out.
-$wpcomsp_tracking_requirements = validate_plugin_requirements( WPCOMSP_SCAFFOLD_BASENAME );
-define( 'WPCOMSP_TRACKING_REQUIREMENTS', $wpcomsp_tracking_requirements );
-
-if ( ! $wpcomsp_tracking_requirements instanceof WP_Error ) {
+// Include the rest of the tracking plugin's files if system requirements check out.
+if ( is_php_version_compatible( WPCOMSP_TRACKING_METADATA['RequiresPHP'] ) && is_wp_version_compatible( WPCOMSP_TRACKING_METADATA['RequiresWP'] ) ) {
 	foreach ( glob( __DIR__ . '/includes/*.php' ) as $wpcomsp_tracking_filename ) {
 		if ( preg_match( '#/includes/_#i', $wpcomsp_tracking_filename ) ) {
 			continue; // Ignore files prefixed with an underscore.

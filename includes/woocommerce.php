@@ -15,7 +15,6 @@ if ( defined( 'WPCOMSP_WC_TRACKING' ) && ! WPCOMSP_WC_TRACKING ) {
  */
 add_filter(
 	'option_woocommerce_allow_tracking',
-	function() {
-		return 'yes';
-	}
+	static fn() => 'yes',
+	PHP_INT_MAX
 );
